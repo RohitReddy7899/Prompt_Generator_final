@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-7">
+    <h4>Prompt Composer</h4>
+    <div class="card p-3">
+      <div class="mb-2">
+        <label>Purpose</label>
+        <input id="purpose" class="form-control" placeholder="e.g. Email campaign">
+      </div>
+      <div class="mb-2">
+        <label>Audience</label>
+        <input id="audience" class="form-control" placeholder="e.g. Students">
+      </div>
+      <div class="mb-2">
+        <label>Tone <span id="tone-label">Friendly</span></label>
+        <input type="range" id="tone" min="0" max="100" value="40" class="form-range">
+      </div>
+      <div class="mb-2">
+        <label>Keywords</label>
+        <input id="keywords" class="form-control" placeholder="comma-separated">
+      </div>
+      <div class="mb-2">
+        <label>Free-form additions</label>
+        <textarea id="freeform" class="form-control" rows="2"></textarea>
+      </div>
+      <button id="compose-btn" class="btn btn-primary">Compose Prompt</button>
+      <button id="save-btn" class="btn btn-outline-success">Save</button>
+      <hr>
+      <h6>Editable Prompt Preview</h6>
+      <textarea id="preview" class="form-control bg-light" rows="5" placeholder="Generated prompt will appear here..."></textarea>
+      <small class="text-muted">
+        You can modify this prompt before saving it. Click “Recalculate Score” to update feedback instantly.
+      </small>
+      <div class="mt-2">
+        <button id="recalc-btn" class="btn btn-sm btn-outline-info">Recalculate Score</button>
+      </div>
+      <div id="score-details" class="small mt-2"></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <h4>Prompt Library</h4>
+    <input id="search-key" class="form-control mb-2" placeholder="Search by keyword">
+    <button id="search-btn" class="btn btn-outline-primary mb-2">Search</button>
+    <div id="library-list" class="border rounded p-2" style="height:400px; overflow:auto;"></div>
+  </div>
+</div>
+{% endblock %}

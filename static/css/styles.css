@@ -1,0 +1,10 @@
+body { font-family: system-ui; }
+#preview {
+  min-height: 120px;
+  resize: vertical;
+  font-family: monospace;
+  background: #f8f9fa;
+}
+.library-item:hover {
+  background-color: #f0f8ff;
+}
