@@ -1,39 +1,83 @@
-let currentScore = {};
+// Make currentScore globally accessible so library.js can update it
+var currentScore = {};
 
-$(function(){
-  function toneLabel(v){
-    if(v<25) return "Formal";
-    if(v<60) return "Friendly";
+$(function () {
+  // ---------- helpers ----------
+
+  function toneLabel(v) {
+    const value = Number(v);
+    if (value < 25) return "Formal";
+    if (value < 60) return "Friendly";
     return "Witty";
   }
-  $("#tone").on("input", function(){
+
+  function updateScoreUI(score) {
+    if (!score || !score.details) {
+      $("#score-details").html("");
+      return;
+    }
+    const d = score.details;
+    $("#score-details").html(
+      `
+      <strong>Total score: ${score.total}</strong><br>
+      <span>Clarity: ${d.clarity}</span> ·
+      <span>Specificity: ${d.specificity}</span> ·
+      <span>Tone match: ${d.tone_match}</span> ·
+      <span>Length bonus: ${d.length_bonus}</span>
+      `
+    );
+  }
+
+  function showMessage(text) {
+    $("#composer-message").text(text).fadeIn(150).delay(1200).fadeOut(200);
+  }
+
+  // ---------- initial tone label ----------
+
+  $("#tone-label").text(toneLabel($("#tone").val() || 40));
+
+  // ---------- events ----------
+
+  // Tone slider label
+  $("#tone").on("input", function () {
     $("#tone-label").text(toneLabel($(this).val()));
   });
-  $("#compose-btn").click(function(){
+
+  // Compose Prompt
+  $("#compose-btn").click(function () {
     const payload = {
       purpose: $("#purpose").val(),
       audience: $("#audience").val(),
       tone_label: toneLabel($("#tone").val()),
       tone: Number($("#tone").val()),
       keywords: $("#keywords").val(),
-      freeform: $("#freeform").val()
+      freeform: $("#freeform").val(),
     };
+
+    if (!payload.purpose.trim()) {
+      showMessage("Please enter a purpose before composing.");
+      return;
+    }
+
     $.ajax({
       url: "/compose",
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify(payload),
-      success: function(res){
+      success: function (res) {
         $("#preview").val(res.prompt);
-        currentScore = res.score;
-        const d = res.score.details;
-        $("#score-details").html(
-          `Score: ${res.score.total}<br><span>Clarity: ${d.clarity}</span><span>Specificity: ${d.specificity}</span><span>Tone: ${d.tone_match}</span>`
-        );
-      }
+        currentScore = res.score || {};
+        updateScoreUI(currentScore);
+        showMessage("Prompt composed.");
+      },
+      error: function () {
+        showMessage("Error composing prompt.");
+      },
     });
   });
-  $("#save-btn").click(function(){
+
+  // Save to Library
+  $("#save-btn").click(function () {
     const payload = {
       purpose: $("#purpose").val(),
       audience: $("#audience").val(),
@@ -42,34 +86,49 @@ $(function(){
       keywords: $("#keywords").val(),
       freeform: $("#freeform").val(),
       prompt: $("#preview").val(),
-      score: currentScore
+      score: currentScore,
     };
+
+    if (!payload.prompt.trim()) {
+      showMessage("Compose a prompt before saving.");
+      return;
+    }
+
     $.ajax({
       url: "/save",
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify(payload),
-      success: function(){ alert("Saved!"); }
+      success: function () {
+        showMessage("Prompt saved to library.");
+      },
+      error: function () {
+        showMessage("Error saving prompt.");
+      },
     });
   });
-  // Manual Recalculate button
-  $("#recalc-btn").click(function(){
+
+  // Recalculate Score after manual edits
+  $("#recalc-btn").click(function () {
     const newText = $("#preview").val();
+    if (!newText.trim()) {
+      showMessage("There is no prompt text to score.");
+      return;
+    }
+
     $.ajax({
       url: "/recalculate_score",
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({ prompt: newText }),
-      success: function(score) {
-        currentScore = score;
-        const d = score.details;
-        $("#score-details").html(
-          `Score: ${score.total}<br>
-           <span>Clarity: ${d.clarity}</span>
-           <span>Specificity: ${d.specificity}</span>
-           <span>Tone: ${d.tone_match}</span>`
-        );
-      }
+      success: function (score) {
+        currentScore = score || {};
+        updateScoreUI(currentScore);
+        showMessage("Score updated.");
+      },
+      error: function () {
+        showMessage("Error recalculating score.");
+      },
     });
   });
 });
