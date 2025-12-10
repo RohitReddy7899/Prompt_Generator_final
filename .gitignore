@@ -1,15 +1,52 @@
+# ============================
 # macOS junk
+# ============================
 .DS_Store
+__MACOSX/
+._*
 
-# Python build junk
+# ============================
+# Python cache / bytecode
+# ============================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*$py.class
 
-# Virtual environment
+# ============================
+# Virtual environments
+# ============================
 venv/
 venv2/
+.venv/
+ENV/
+env/
+env.bak/
 
-# Fonts / zips temporary
-*.zip
+# ============================
+# Fonts / large temporary assets
+# (specific to this project)
+# ============================
 Science_Gothic/
+*.zip
+
+# ============================
+# Logs
+# ============================
+*.log
+
+# ============================
+# IDE / editor configs
+# (just in case you use them)
+# ============================
+.vscode/
+.idea/
+*.iml
+
+# ============================
+# Build / dist (if added later)
+# ============================
+dist/
+build/
 
